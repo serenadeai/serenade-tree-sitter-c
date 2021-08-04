@@ -31,7 +31,6 @@ module.exports = grammar({
 
   inline: $ => [
     $._statement,
-    $._top_level_item,
     $._type_identifier,
     $._field_identifier,
     $._statement_identifier,
@@ -44,6 +43,9 @@ module.exports = grammar({
     [$._type_specifier, $._declarator, $.macro_type_specifier],
     [$._type_specifier, $._expression],
     [$._type_specifier, $._expression, $.macro_type_specifier],
+    // [$._type_specifier, $._declarator, $._expression, $.macro_type_specifier],
+    // [$._type_specifier, $._declarator, $._expression],
+    // [$._declarator, $._expression],
     [$._type_specifier, $.macro_type_specifier],
     [$.sized_type_specifier],
   ],
@@ -51,9 +53,14 @@ module.exports = grammar({
   word: $ => $.identifier,
 
   rules: {
-    translation_unit: $ => repeat($._top_level_item),
+    translation_unit: $ => 
+    seq(
+      optional_with_placeholder('import_list', repeat(prec(10, $.preproc_include))),
+      optional_with_placeholder('using_list', prec(-100, "----DONT_MATCH_THIS")),
+      optional_with_placeholder('statement_list', repeat($.top_level_item))
+    ),
 
-    _top_level_item: $ => choice(
+    top_level_item: $ => choice(
       $.function_definition,
       $.linkage_specification,
       $.declaration,
@@ -106,7 +113,7 @@ module.exports = grammar({
       '\n'
     ),
 
-    ...preprocIf('', $ => $._top_level_item),
+    ...preprocIf('', $ => $.top_level_item),
     ...preprocIf('_in_field_declaration_list', $ => $._field_declaration_list_item),
 
     preproc_directive: $ => /#[ \t]*[a-zA-Z]\w*/,
@@ -183,19 +190,24 @@ module.exports = grammar({
 
     // Main Grammar
 
+    // TODO: Fix this (need ModifierList for the modifiers). 
     function_definition: $ => seq(
-      optional($.ms_call_modifier),
-      $._declaration_specifiers,
-      field('declarator', $._declarator),
+      field('type_specifier_and_declarator', seq(
+        optional($.ms_call_modifier), 
+        $.declaration_specifiers, 
+        $._declarator
+      )),
       field('body', $.compound_statement)
     ),
 
     declaration: $ => seq(
-      $._declaration_specifiers,
-      commaSep1(field('declarator', choice(
-        $._declarator,
-        $.init_declarator
-      ))),
+      field('type_specifier_and_declarator', seq(
+        $.declaration_specifiers,
+        commaSep1(choice(
+          $._declarator,
+          $.init_declarator
+        ))
+      )),
       ';'
     ),
 
@@ -207,20 +219,20 @@ module.exports = grammar({
       ';'
     ),
 
-    _declaration_specifiers: $ => seq(
-      repeat(choice(
+    declaration_specifiers: $ => seq(
+      optional_with_placeholder('modifier_list', repeat(choice(
         $.storage_class_specifier,
         $.type_qualifier,
         $.attribute_specifier,
         $.ms_declspec_modifier
-      )),
+      ))),
       field('type', $._type_specifier),
-      repeat(choice(
+      optional(field('trailing_modifier', repeat(choice(
         $.storage_class_specifier,
         $.type_qualifier,
         $.attribute_specifier,
         $.ms_declspec_modifier
-      ))
+      ))))
     ),
 
     linkage_specification: $ => seq(
@@ -278,7 +290,7 @@ module.exports = grammar({
 
     declaration_list: $ => seq(
       '{',
-      repeat($._top_level_item),
+      optional_with_placeholder('class_member_list', repeat($.top_level_item)),
       '}'
     ),
 
@@ -365,20 +377,20 @@ module.exports = grammar({
     function_declarator: $ => prec(1,
       seq(
         field('declarator', $._declarator),
-        field('parameters', $.parameter_list),
-        repeat($.attribute_specifier),
+        field('parameters', $.parameter_list_block),
+        optional(field('attribute_specifiers', repeat($.attribute_specifier))),
       )),
     function_field_declarator: $ => prec(1, seq(
       field('declarator', $._field_declarator),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
     function_type_declarator: $ => prec(1, seq(
       field('declarator', $._type_declarator),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
     abstract_function_declarator: $ => prec(1, seq(
       field('declarator', optional($._abstract_declarator)),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
 
     array_declarator: $ => prec(1, seq(
@@ -411,14 +423,14 @@ module.exports = grammar({
     )),
 
     init_declarator: $ => seq(
-      field('declarator', $._declarator),
+      field('assignment_declarator', $._declarator),
       '=',
-      field('value', choice($.initializer_list, $._expression))
+      field('assignment_value', choice($.initializer_list, $._expression))
     ),
 
     compound_statement: $ => seq(
       '{',
-      repeat($._top_level_item),
+      optional_with_placeholder('statement_list', repeat($.top_level_item)),
       '}'
     ),
 
@@ -490,8 +502,9 @@ module.exports = grammar({
 
     enumerator_list: $ => seq(
       '{',
-      commaSep($.enumerator),
-      optional(','),
+      optional_with_placeholder("enum_member_list", seq(
+        commaSep($.enumerator),
+        optional(','))),
       '}'
     ),
 
@@ -521,7 +534,7 @@ module.exports = grammar({
 
     field_declaration_list: $ => seq(
       '{',
-      repeat($._field_declaration_list_item),
+      optional_with_placeholder('class_member_list', repeat($._field_declaration_list_item)),
       '}'
     ),
 
@@ -535,8 +548,10 @@ module.exports = grammar({
     ),
 
     field_declaration: $ => seq(
-      $._declaration_specifiers,
-      commaSep(field('declarator', $._field_declarator)),
+      field('type_specifier_and_declarator', seq(
+        $.declaration_specifiers,
+        commaSep($._field_declarator)
+      )),
       optional($.bitfield_clause),
       ';'
     ),
@@ -548,19 +563,19 @@ module.exports = grammar({
       optional(seq('=', field('value', $._expression)))
     ),
 
-    parameter_list: $ => seq(
+    parameter_list_block: $ => seq(
       '(',
       commaSep(choice($.parameter_declaration, '...')),
       ')'
     ),
 
-    parameter_declaration: $ => seq(
-      $._declaration_specifiers,
-      optional(field('declarator', choice(
+    parameter_declaration: $ => field('type_specifier_and_declarator', seq( 
+      $.declaration_specifiers,
+      optional(choice(
         $._declarator,
         $._abstract_declarator
-      )))
-    ),
+      ))
+    )),
 
     // Statements
 
@@ -643,6 +658,11 @@ module.exports = grammar({
 
     for_statement: $ => seq(
       'for',
+      $.for_statement_expression,
+      field('for_statement_body', $._statement)
+    ),
+
+    for_statement_expression: $ => seq(
       '(',
       choice(
         field('initializer', $.declaration),
@@ -650,8 +670,7 @@ module.exports = grammar({
       ),
       field('condition', optional($._expression)), ';',
       field('update', optional(choice($._expression, $.comma_expression))),
-      ')',
-      $._statement
+      ')'
     ),
 
     return_statement: $ => seq(
@@ -821,8 +840,8 @@ module.exports = grammar({
     )),
 
     call_expression: $ => prec(PREC.CALL, seq(
-      field('function', $._expression),
-      field('arguments', $.argument_list)
+      field('function_1', $._expression),
+      field('arguments_1', $.argument_list)
     )),
 
     argument_list: $ => seq('(', commaSep($._expression), ')'),
@@ -1041,4 +1060,8 @@ function commaSep1 (rule) {
 
 function commaSepTrailing (recurSymbol, rule) {
   return choice(rule, seq(recurSymbol, ',', rule))
+}
+
+function optional_with_placeholder(field_name, rule) {
+  return choice(field(field_name, rule), field(field_name, blank()));
 }
