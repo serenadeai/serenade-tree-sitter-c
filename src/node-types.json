@@ -145,7 +145,7 @@
     "type": "abstract_function_declarator",
     "named": true,
     "fields": {
-      "declarator": {
+      "identifier": {
         "multiple": false,
         "required": false,
         "types": [
@@ -275,20 +275,9 @@
     }
   },
   {
-    "type": "argument_list_block",
+    "type": "argument_list_",
     "named": true,
-    "fields": {
-      "argument_list": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "argument_list",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": false,
@@ -298,7 +287,7 @@
           "named": true
         },
         {
-          "type": "call_expression",
+          "type": "call",
           "named": true
         },
         {
@@ -329,6 +318,22 @@
     }
   },
   {
+    "type": "argument_list_block",
+    "named": true,
+    "fields": {
+      "argument_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "array_declarator",
     "named": true,
     "fields": {
@@ -338,10 +343,6 @@
         "types": [
           {
             "type": "array_declarator",
-            "named": true
-          },
-          {
-            "type": "field_declarator",
             "named": true
           },
           {
@@ -358,6 +359,102 @@
           },
           {
             "type": "pointer_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_qualifier",
+            "named": true
+          }
+        ]
+      },
+      "size": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "*",
+            "named": false
+          },
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "array_field_declarator",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "field_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_qualifier",
+            "named": true
+          }
+        ]
+      },
+      "size": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "*",
+            "named": false
+          },
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "array_type_declarator",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array_type_declarator",
+            "named": true
+          },
+          {
+            "type": "function_type_declarator",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type_declarator",
+            "named": true
+          },
+          {
+            "type": "pointer_type_declarator",
             "named": true
           }
         ]
@@ -525,6 +622,10 @@
             "named": true
           },
           {
+            "type": "call",
+            "named": true
+          },
+          {
             "type": "preproc_defined",
             "named": true
           }
@@ -617,6 +718,10 @@
             "named": true
           },
           {
+            "type": "call",
+            "named": true
+          },
+          {
             "type": "preproc_defined",
             "named": true
           }
@@ -687,6 +792,32 @@
     "fields": {}
   },
   {
+    "type": "call",
+    "named": true,
+    "fields": {
+      "arguments": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list_",
+            "named": true
+          }
+        ]
+      },
+      "function_": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "call_expression",
     "named": true,
     "fields": {
@@ -700,22 +831,12 @@
           }
         ]
       },
-      "function": {
+      "function_": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "_expression",
-            "named": true
-          }
-        ]
-      },
-      "function_": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
             "named": true
           }
         ]
@@ -1245,7 +1366,7 @@
     "type": "enum_specifier",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
@@ -1407,11 +1528,11 @@
       "required": true,
       "types": [
         {
-          "type": "array_declarator",
+          "type": "array_field_declarator",
           "named": true
         },
         {
-          "type": "function_declarator",
+          "type": "function_field_declarator",
           "named": true
         },
         {
@@ -1419,11 +1540,11 @@
           "named": true
         },
         {
-          "type": "parenthesized_declarator",
+          "type": "parenthesized_field_declarator",
           "named": true
         },
         {
-          "type": "pointer_declarator",
+          "type": "pointer_field_declarator",
           "named": true
         }
       ]
@@ -1549,16 +1670,12 @@
     "type": "function_declarator",
     "named": true,
     "fields": {
-      "declarator": {
+      "identifier": {
         "multiple": false,
         "required": true,
         "types": [
           {
             "type": "array_declarator",
-            "named": true
-          },
-          {
-            "type": "field_declarator",
             "named": true
           },
           {
@@ -1658,6 +1775,74 @@
     }
   },
   {
+    "type": "function_field_declarator",
+    "named": true,
+    "fields": {
+      "identifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "field_declarator",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list_block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "function_type_declarator",
+    "named": true,
+    "fields": {
+      "identifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array_type_declarator",
+            "named": true
+          },
+          {
+            "type": "function_type_declarator",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type_declarator",
+            "named": true
+          },
+          {
+            "type": "pointer_type_declarator",
+            "named": true
+          }
+        ]
+      },
+      "parameters": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "parameter_list_block",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "goto_statement",
     "named": true,
     "fields": {
@@ -1732,7 +1917,21 @@
     "type": "init_declarator",
     "named": true,
     "fields": {
-      "declarator": {
+      "assignment_value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "initializer_list",
+            "named": true
+          }
+        ]
+      },
+      "assignment_variable": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1754,20 +1953,6 @@
           },
           {
             "type": "pointer_declarator",
-            "named": true
-          }
-        ]
-      },
-      "value": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "initializer_list",
             "named": true
           }
         ]
@@ -2104,10 +2289,6 @@
           "named": true
         },
         {
-          "type": "field_declarator",
-          "named": true
-        },
-        {
           "type": "function_declarator",
           "named": true
         },
@@ -2139,11 +2320,61 @@
           "named": true
         },
         {
+          "type": "call",
+          "named": true
+        },
+        {
           "type": "comma_expression",
           "named": true
         },
         {
           "type": "preproc_defined",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized_field_declarator",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "field_declarator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized_type_declarator",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "array_type_declarator",
+          "named": true
+        },
+        {
+          "type": "function_type_declarator",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "parenthesized_type_declarator",
+          "named": true
+        },
+        {
+          "type": "pointer_type_declarator",
           "named": true
         }
       ]
@@ -2159,10 +2390,6 @@
         "types": [
           {
             "type": "array_declarator",
-            "named": true
-          },
-          {
-            "type": "field_declarator",
             "named": true
           },
           {
@@ -2237,6 +2464,102 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "pointer_field_declarator",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "field_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_qualifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ms_based_modifier",
+          "named": true
+        },
+        {
+          "type": "ms_pointer_modifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "pointer_type_declarator",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "array_type_declarator",
+            "named": true
+          },
+          {
+            "type": "function_type_declarator",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "parenthesized_type_declarator",
+            "named": true
+          },
+          {
+            "type": "pointer_type_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "type_qualifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ms_based_modifier",
+          "named": true
+        },
+        {
+          "type": "ms_pointer_modifier",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2333,7 +2656,7 @@
             "named": true
           },
           {
-            "type": "call_expression",
+            "type": "call",
             "named": true
           },
           {
@@ -2500,7 +2823,7 @@
             "named": true
           },
           {
-            "type": "call_expression",
+            "type": "call",
             "named": true
           },
           {
@@ -2638,7 +2961,7 @@
         "required": true,
         "types": [
           {
-            "type": "call_expression",
+            "type": "call",
             "named": true
           },
           {
@@ -2893,7 +3216,7 @@
     "type": "struct_specifier",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
@@ -3060,11 +3383,11 @@
         "required": true,
         "types": [
           {
-            "type": "array_declarator",
+            "type": "array_type_declarator",
             "named": true
           },
           {
-            "type": "function_declarator",
+            "type": "function_type_declarator",
             "named": true
           },
           {
@@ -3072,11 +3395,11 @@
             "named": true
           },
           {
-            "type": "parenthesized_declarator",
+            "type": "parenthesized_type_declarator",
             "named": true
           },
           {
-            "type": "pointer_declarator",
+            "type": "pointer_type_declarator",
             "named": true
           }
         ]
@@ -3237,6 +3560,10 @@
         "types": [
           {
             "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "call",
             "named": true
           },
           {
