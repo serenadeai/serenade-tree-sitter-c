@@ -3146,7 +3146,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "enum_specifier"
+          "name": "enum"
         },
         {
           "type": "SYMBOL",
@@ -3324,7 +3324,7 @@
         ]
       }
     },
-    "enum_specifier": {
+    "enum": {
       "type": "SEQ",
       "members": [
         {

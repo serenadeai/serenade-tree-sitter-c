@@ -1170,7 +1170,7 @@
         "required": true,
         "types": [
           {
-            "type": "enum_specifier",
+            "type": "enum",
             "named": true
           },
           {
@@ -1316,7 +1316,7 @@
       "required": true,
       "types": [
         {
-          "type": "enum_specifier",
+          "type": "enum",
           "named": true
         },
         {
@@ -1363,7 +1363,7 @@
     }
   },
   {
-    "type": "enum_specifier",
+    "type": "enum",
     "named": true,
     "fields": {
       "enclosed_body": {
@@ -3419,7 +3419,7 @@
         "required": true,
         "types": [
           {
-            "type": "enum_specifier",
+            "type": "enum",
             "named": true
           },
           {
@@ -3491,7 +3491,7 @@
         "required": true,
         "types": [
           {
-            "type": "enum_specifier",
+            "type": "enum",
             "named": true
           },
           {

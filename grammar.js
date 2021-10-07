@@ -448,7 +448,7 @@ module.exports = grammar({
     _type_specifier: $ => choice(
       $.struct_specifier,
       $.union_specifier,
-      $.enum_specifier,
+      $.enum,
       $.macro_type_specifier,
       $.sized_type_specifier,
       $.primitive_type,
@@ -485,7 +485,7 @@ module.exports = grammar({
       ...[8, 16, 32, 64].map(n => `char${n}_t`)
     )),
 
-    enum_specifier: $ => seq(
+    enum: $ => seq(
       'enum',
       choice(
         seq(
