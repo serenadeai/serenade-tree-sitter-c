@@ -389,6 +389,21 @@
     }
   },
   {
+    "type": "argument",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "argument_list",
     "named": true,
     "fields": {},
@@ -397,7 +412,7 @@
       "required": true,
       "types": [
         {
-          "type": "_expression",
+          "type": "argument",
           "named": true
         }
       ]

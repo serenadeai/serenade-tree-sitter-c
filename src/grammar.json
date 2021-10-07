@@ -5791,12 +5791,16 @@
         ]
       }
     },
+    "argument": {
+      "type": "SYMBOL",
+      "name": "_expression"
+    },
     "argument_list": {
       "type": "SEQ",
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_expression"
+          "name": "argument"
         },
         {
           "type": "REPEAT",
@@ -5809,7 +5813,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "_expression"
+                "name": "argument"
               }
             ]
           }

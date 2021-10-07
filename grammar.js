@@ -872,7 +872,9 @@ module.exports = grammar({
       field('arguments', $.argument_list_block)
     )),
 
-    argument_list: $ => commaSep1($._expression), 
+    argument: $ => $._expression, 
+
+    argument_list: $ => commaSep1($.argument), 
 
     argument_list_block: $ => seq('(', optional_with_placeholder('argument_list', $.argument_list), ')'),
 
