@@ -218,20 +218,17 @@ module.exports = grammar({
       ';'
     ),
 
+    declaration_specifier: $ => choice(
+      $.storage_class_specifier,
+      $.type_qualifier,
+      $.attribute_specifier,
+      $.ms_declspec_modifier
+    ),
+
     declaration_specifiers: $ => seq(
-      repeat(choice(
-        $.storage_class_specifier,
-        $.type_qualifier,
-        $.attribute_specifier,
-        $.ms_declspec_modifier
-      )),
+      optional_with_placeholder('modifier_list', repeat($.declaration_specifier)),
       field('type', $._type_specifier),
-      repeat(choice(
-        $.storage_class_specifier,
-        $.type_qualifier,
-        $.attribute_specifier,
-        $.ms_declspec_modifier
-      ))
+      optional_with_placeholder('modifier_list', repeat($.declaration_specifier)),
     ),
 
     linkage_specification: $ => seq(
@@ -244,19 +241,19 @@ module.exports = grammar({
       ))
     ),
 
-    attribute_specifier: $ => seq(
+    attribute_specifier: $ => field('modifier', seq(
       '__attribute__',
       '(',
       $.argument_list,
       ')'
-    ),
+    )),
 
-    ms_declspec_modifier: $ => seq(
+    ms_declspec_modifier: $ => field('modifier', seq(
       '__declspec',
       '(',
       $.identifier,
       ')',
-    ),
+    )),
 
     ms_based_modifier: $ => seq(
       '__based',
@@ -433,20 +430,20 @@ module.exports = grammar({
       '}'
     ),
 
-    storage_class_specifier: $ => choice(
+    storage_class_specifier: $ => field('modifier', choice(
       'extern',
       'static' ,
       'auto',
       'register',
       'inline'
-    ),
+    )),
 
-    type_qualifier: $ => choice(
+    type_qualifier: $ => field('modifier', choice(
       'const',
       'volatile',
       'restrict',
       '_Atomic'
-    ),
+    )),
 
     _type_specifier: $ => choice(
       $.struct_specifier,

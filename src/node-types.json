@@ -554,16 +554,29 @@
   {
     "type": "attribute_specifier",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "argument_list",
-          "named": true
-        }
-      ]
+    "fields": {
+      "modifier": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "__attribute__",
+            "named": false
+          },
+          {
+            "type": "argument_list",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1022,23 +1035,12 @@
     }
   },
   {
-    "type": "declaration_specifiers",
+    "type": "declaration_specifier",
     "named": true,
-    "fields": {
-      "type": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "_type_specifier",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
-      "multiple": true,
-      "required": false,
+      "multiple": false,
+      "required": true,
       "types": [
         {
           "type": "attribute_specifier",
@@ -1057,6 +1059,32 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "declaration_specifiers",
+    "named": true,
+    "fields": {
+      "modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "declaration_specifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_type_specifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1779,16 +1807,29 @@
   {
     "type": "ms_declspec_modifier",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        }
-      ]
+    "fields": {
+      "modifier": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "__declspec",
+            "named": false
+          },
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2534,7 +2575,34 @@
   {
     "type": "storage_class_specifier",
     "named": true,
-    "fields": {}
+    "fields": {
+      "modifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "auto",
+            "named": false
+          },
+          {
+            "type": "extern",
+            "named": false
+          },
+          {
+            "type": "inline",
+            "named": false
+          },
+          {
+            "type": "register",
+            "named": false
+          },
+          {
+            "type": "static",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "string_literal",
@@ -2788,7 +2856,30 @@
   {
     "type": "type_qualifier",
     "named": true,
-    "fields": {}
+    "fields": {
+      "modifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_Atomic",
+            "named": false
+          },
+          {
+            "type": "const",
+            "named": false
+          },
+          {
+            "type": "restrict",
+            "named": false
+          },
+          {
+            "type": "volatile",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "unary_expression",
