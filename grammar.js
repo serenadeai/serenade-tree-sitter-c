@@ -298,7 +298,7 @@ module.exports = grammar({
       $.identifier
     ),
 
-    _field_declarator: $ => choice(
+    field_declarator: $ => choice(
       alias($.pointer_field_declarator, $.pointer_declarator),
       alias($.function_field_declarator, $.function_declarator),
       alias($.array_field_declarator, $.array_declarator),
@@ -328,7 +328,7 @@ module.exports = grammar({
     )),
     parenthesized_field_declarator: $ => prec.dynamic(PREC.PAREN_DECLARATOR, seq(
       '(',
-      $._field_declarator,
+      $.field_declarator,
       ')'
     )),
     parenthesized_type_declarator: $ => prec.dynamic(PREC.PAREN_DECLARATOR, seq(
@@ -356,7 +356,7 @@ module.exports = grammar({
       '*',
       repeat($.ms_pointer_modifier),
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('declarator', $._field_declarator)
+      field('declarator', $.field_declarator)
     ))),
     pointer_type_declarator: $ => prec.dynamic(1, prec.right(seq(
       optional($.ms_based_modifier),
@@ -377,7 +377,7 @@ module.exports = grammar({
         repeat($.attribute_specifier),
       )),
     function_field_declarator: $ => prec(1, seq(
-      field('declarator', $._field_declarator),
+      field('declarator', $.field_declarator),
       field('parameters', $.parameter_list_block)
     )),
     function_type_declarator: $ => prec(1, seq(
@@ -397,7 +397,7 @@ module.exports = grammar({
       ']'
     )),
     array_field_declarator: $ => prec(1, seq(
-      field('declarator', $._field_declarator),
+      field('declarator', $.field_declarator),
       '[',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('size', optional(choice($._expression, '*'))),
@@ -550,7 +550,7 @@ module.exports = grammar({
 
     field_declaration: $ => seq(
       $.declaration_specifiers,
-      commaSep(field('declarator', $._field_declarator)),
+      commaSep(field('declarator', $.field_declarator)),
       optional($.bitfield_clause),
       ';'
     ),
@@ -590,11 +590,11 @@ module.exports = grammar({
       $.enclosed_body,
       $.expression_statement,
       $.if,
-      $.switch_statement,
+      $.switch,
       $.do_statement,
-      $.while_statement,
+      $.while,
       $.for,
-      $.return_statement,
+      $.return,
       $.break_statement,
       $.continue_statement,
       $.goto_statement
@@ -635,7 +635,7 @@ module.exports = grammar({
 
     else_clause: $ => seq('else', $.statement),
 
-    switch_statement: $ => seq(
+    switch: $ => seq(
       'switch',
       '(', 
       $.condition, 
@@ -656,7 +656,7 @@ module.exports = grammar({
       ))
     )),
 
-    while_statement: $ => seq(
+    while: $ => seq(
       'while',
       '(', 
       $.condition, 
@@ -701,7 +701,7 @@ module.exports = grammar({
 
     return_value: $ => choice($._expression, $.comma_expression), 
 
-    return_statement: $ => seq(
+    return: $ => seq(
       'return',
       optional_with_placeholder('return_value_optional', $.return_value),
       ';'
@@ -1026,12 +1026,12 @@ module.exports = grammar({
 
   supertypes: $ => [
     $._expression,
-    $.statement,
-    $._type_specifier,
-    $._declarator,
-    $._field_declarator,
-    $._type_declarator,
-    $._abstract_declarator,
+    // $.statement,
+    // $._type_specifier,
+    // $._declarator,
+    // $.field_declarator,
+    // $._type_declarator,
+    // $._abstract_declarator,
   ]
 });
 

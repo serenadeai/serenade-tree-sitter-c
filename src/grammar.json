@@ -2182,7 +2182,7 @@
         }
       ]
     },
-    "_field_declarator": {
+    "field_declarator": {
       "type": "CHOICE",
       "members": [
         {
@@ -2326,7 +2326,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "_field_declarator"
+            "name": "field_declarator"
           },
           {
             "type": "STRING",
@@ -2504,7 +2504,7 @@
               "name": "declarator",
               "content": {
                 "type": "SYMBOL",
-                "name": "_field_declarator"
+                "name": "field_declarator"
               }
             }
           ]
@@ -2677,7 +2677,7 @@
             "name": "declarator",
             "content": {
               "type": "SYMBOL",
-              "name": "_field_declarator"
+              "name": "field_declarator"
             }
           },
           {
@@ -2833,7 +2833,7 @@
             "name": "declarator",
             "content": {
               "type": "SYMBOL",
-              "name": "_field_declarator"
+              "name": "field_declarator"
             }
           },
           {
@@ -3713,7 +3713,7 @@
                   "name": "declarator",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "_field_declarator"
+                    "name": "field_declarator"
                   }
                 },
                 {
@@ -3730,7 +3730,7 @@
                         "name": "declarator",
                         "content": {
                           "type": "SYMBOL",
-                          "name": "_field_declarator"
+                          "name": "field_declarator"
                         }
                       }
                     ]
@@ -3964,7 +3964,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "switch_statement"
+          "name": "switch"
         },
         {
           "type": "SYMBOL",
@@ -3972,7 +3972,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "while_statement"
+          "name": "while"
         },
         {
           "type": "SYMBOL",
@@ -3980,7 +3980,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "return_statement"
+          "name": "return"
         },
         {
           "type": "SYMBOL",
@@ -4187,7 +4187,7 @@
         }
       ]
     },
-    "switch_statement": {
+    "switch": {
       "type": "SEQ",
       "members": [
         {
@@ -4275,7 +4275,7 @@
         ]
       }
     },
-    "while_statement": {
+    "while": {
       "type": "SEQ",
       "members": [
         {
@@ -4483,7 +4483,7 @@
         }
       ]
     },
-    "return_statement": {
+    "return": {
       "type": "SEQ",
       "members": [
         {
@@ -6874,13 +6874,7 @@
     "_assignment_left_expression"
   ],
   "supertypes": [
-    "_expression",
-    "statement",
-    "_type_specifier",
-    "_declarator",
-    "_field_declarator",
-    "_type_declarator",
-    "_abstract_declarator"
+    "_expression"
   ],
   "PREC": {
     "PAREN_DECLARATOR": -10,
