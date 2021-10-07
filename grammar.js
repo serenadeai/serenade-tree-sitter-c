@@ -212,7 +212,7 @@ module.exports = grammar({
 
     type_definition: $ => seq(
       'typedef',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('type', $._type_specifier),
       commaSep1(field('declarator', $._type_declarator)),
       ';'
@@ -348,25 +348,25 @@ module.exports = grammar({
       optional($.ms_based_modifier),
       '*',
       repeat($.ms_pointer_modifier),
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('declarator', $._declarator)
     ))),
     pointer_field_declarator: $ => prec.dynamic(1, prec.right(seq(
       optional($.ms_based_modifier),
       '*',
       repeat($.ms_pointer_modifier),
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('declarator', $._field_declarator)
     ))),
     pointer_type_declarator: $ => prec.dynamic(1, prec.right(seq(
       optional($.ms_based_modifier),
       '*',
       repeat($.ms_pointer_modifier),
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('declarator', $._type_declarator)
     ))),
     abstract_pointer_declarator: $ => prec.dynamic(1, prec.right(seq('*',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('declarator', optional($._abstract_declarator))
     ))),
 
@@ -392,28 +392,28 @@ module.exports = grammar({
     array_declarator: $ => prec(1, seq(
       field('declarator', $._declarator),
       '[',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('size', optional(choice($._expression, '*'))),
       ']'
     )),
     array_field_declarator: $ => prec(1, seq(
       field('declarator', $._field_declarator),
       '[',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('size', optional(choice($._expression, '*'))),
       ']'
     )),
     array_type_declarator: $ => prec(1, seq(
       field('declarator', $._type_declarator),
       '[',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('size', optional(choice($._expression, '*'))),
       ']'
     )),
     abstract_array_declarator: $ => prec(1, seq(
       field('declarator', optional($._abstract_declarator)),
       '[',
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('size', optional(choice($._expression, '*'))),
       ']'
     )),
@@ -593,7 +593,7 @@ module.exports = grammar({
       $.switch_statement,
       $.do_statement,
       $.while_statement,
-      $.for_statement,
+      $.for,
       $.return_statement,
       $.break_statement,
       $.continue_statement,
@@ -672,22 +672,38 @@ module.exports = grammar({
       ';'
     ),
 
-    for_statement: $ => seq(
+    for: $ => $.for_clause,
+
+    for_clause: $ => seq(
       'for',
       '(',
-      choice(
-        field('initializer', $.declaration),
-        seq(field('initializer', optional(choice($._expression, $.comma_expression))), ';')
-      ),
-      field('condition', optional($._expression)), ';',
-      field('update', optional(choice($._expression, $.comma_expression))),
+      optional_with_placeholder('block_initializer_optional', $.block_initializer),
+      // choice(
+      //   field('initializer', $.declaration),
+      //   seq(field('initializer', optional(choice($._expression, $.comma_expression))), ';')
+      // ),
+      ';', 
+      optional_with_placeholder('condition_optional', alias($._expression, $.condition)),
+      ';',
+      optional_with_placeholder('block_update_optional', $.block_update),
+      // field('condition', optional($._expression)), ';',
+      // field('update', optional(choice($._expression, $.comma_expression))),
       ')',
       $.statement
     ),
 
+    block_initializer: $ => choice(
+      $.declaration_without_semicolon,
+      choice($._expression, $.comma_expression)
+    ), 
+
+    block_update: $ => choice($._expression, $.comma_expression), 
+
+    return_value: $ => choice($._expression, $.comma_expression), 
+
     return_statement: $ => seq(
       'return',
-      optional(choice($._expression, $.comma_expression)),
+      optional_with_placeholder('return_value_optional', $.return_value),
       ';'
     ),
 
@@ -830,9 +846,9 @@ module.exports = grammar({
     )),
 
     type_descriptor: $ => seq(
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('type', $._type_specifier),
-      repeat($.type_qualifier),
+      optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
       field('declarator', optional($._abstract_declarator))
     ),
 
