@@ -525,9 +525,9 @@ module.exports = grammar({
       choice(
         seq(
           field('name', $._type_identifier),
-          field('body', optional($.field_declaration_list))
+          field('enclosed_body', optional($.field_declaration_list))
         ),
-        field('body', $.field_declaration_list)
+        field('enclosed_body', $.field_declaration_list)
       )
     ),
 
@@ -544,10 +544,11 @@ module.exports = grammar({
       $.preproc_def,
       $.preproc_function_def,
       $.preproc_call,
-      alias($.preproc_if_in_field_declaration_list, $.preproc_if),
-      alias($.preproc_ifdef_in_field_declaration_list, $.preproc_ifdef),
+      $.preproc_if_in_field_declaration_list,
+      $.preproc_ifdef_in_field_declaration_list,
     ),
 
+    // Serenade note: Not updated to spec, since overridden.
     field_declaration: $ => seq(
       $.declaration_specifiers,
       commaSep(field('declarator', $.field_declarator)),
@@ -656,7 +657,9 @@ module.exports = grammar({
       ))
     )),
 
-    while: $ => seq(
+    while: $ => $.while_clause, 
+
+    while_clause: $ => seq(
       'while',
       '(', 
       $.condition, 

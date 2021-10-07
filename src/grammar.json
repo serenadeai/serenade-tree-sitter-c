@@ -3552,7 +3552,7 @@
                 },
                 {
                   "type": "FIELD",
-                  "name": "body",
+                  "name": "enclosed_body",
                   "content": {
                     "type": "CHOICE",
                     "members": [
@@ -3570,7 +3570,7 @@
             },
             {
               "type": "FIELD",
-              "name": "body",
+              "name": "enclosed_body",
               "content": {
                 "type": "SYMBOL",
                 "name": "field_declaration_list"
@@ -3636,22 +3636,12 @@
           "name": "preproc_call"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "preproc_if_in_field_declaration_list"
-          },
-          "named": true,
-          "value": "preproc_if"
+          "type": "SYMBOL",
+          "name": "preproc_if_in_field_declaration_list"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "preproc_ifdef_in_field_declaration_list"
-          },
-          "named": true,
-          "value": "preproc_ifdef"
+          "type": "SYMBOL",
+          "name": "preproc_ifdef_in_field_declaration_list"
         }
       ]
     },
@@ -4236,6 +4226,10 @@
       }
     },
     "while": {
+      "type": "SYMBOL",
+      "name": "while_clause"
+    },
+    "while_clause": {
       "type": "SEQ",
       "members": [
         {
