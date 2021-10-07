@@ -147,8 +147,8 @@ module.exports = grammar({
     )),
 
     preproc_call_expression: $ => prec(PREC.CALL, seq(
-      field('function', $.identifier),
-      field('arguments', alias($.preproc_argument_list, $.argument_list))
+      field('function_', $.identifier),
+      field('arguments', alias($.preproc_argument_list, $.argument_list_block))
     )),
 
     preproc_argument_list: $ => seq(
@@ -194,7 +194,7 @@ module.exports = grammar({
       optional($.ms_call_modifier),
       $.declaration_specifiers,
       field('declarator', $._declarator),
-      field('body', $.compound_statement)
+      field('body', $.enclosed_body)
     ),
 
     declaration_without_semicolon: $ => seq(
@@ -244,7 +244,7 @@ module.exports = grammar({
     attribute_specifier: $ => field('modifier', seq(
       '__attribute__',
       '(',
-      $.argument_list,
+      $.argument_list_block,
       ')'
     )),
 
@@ -257,7 +257,7 @@ module.exports = grammar({
 
     ms_based_modifier: $ => seq(
       '__based',
-      $.argument_list,
+      $.argument_list_block,
     ),
 
     ms_call_modifier: $ => choice(
@@ -424,7 +424,7 @@ module.exports = grammar({
       field('value', choice($.initializer_list, $._expression))
     ),
 
-    compound_statement: $ => seq(
+    enclosed_body: $ => seq(
       '{',
       optional_with_placeholder('statement_list', repeat($.top_level_item)),
       '}'
@@ -490,16 +490,20 @@ module.exports = grammar({
       choice(
         seq(
           field('name', $._type_identifier),
-          field('body', optional($.enumerator_list))
+          field('body', optional($.enumerator_list_block))
         ),
-        field('body', $.enumerator_list)
+        field('body', $.enumerator_list_block)
       )
     ),
 
-    enumerator_list: $ => seq(
+    enumerator_list_block: $ => seq(
       '{',
-      commaSep($.enumerator),
-      optional(','),
+      optional_with_placeholder(
+        'enum_member_list',
+        seq(
+          commaSep($.enumerator),
+          optional(',')
+      )),
       '}'
     ),
 
@@ -529,7 +533,9 @@ module.exports = grammar({
 
     field_declaration_list: $ => seq(
       '{',
-      repeat($._field_declaration_list_item),
+      optional_with_placeholder('class_member_list',
+        repeat($._field_declaration_list_item)
+      ),
       '}'
     ),
 
@@ -581,7 +587,7 @@ module.exports = grammar({
 
     _non_case_statement: $ => choice(
       $.labeled_statement,
-      $.compound_statement,
+      $.enclosed_body,
       $.expression_statement,
       $.if,
       $.switch_statement,
@@ -634,7 +640,7 @@ module.exports = grammar({
       '(', 
       $.condition, 
       ')', 
-      field('body', $.compound_statement)
+      field('body', $.enclosed_body)
     ),
 
     case_statement: $ => prec.right(seq(
@@ -847,10 +853,12 @@ module.exports = grammar({
 
     call_expression: $ => prec(PREC.CALL, seq(
       field('function', $._expression),
-      field('arguments', $.argument_list)
+      field('arguments', $.argument_list_block)
     )),
 
-    argument_list: $ => seq('(', commaSep($._expression), ')'),
+    argument_list: $ => commaSep1($._expression), 
+
+    argument_list_block: $ => seq('(', optional_with_placeholder('argument_list', $.argument_list), ')'),
 
     field_expression: $ => seq(
       prec(PREC.FIELD, seq(
