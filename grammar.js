@@ -30,8 +30,8 @@ module.exports = grammar({
   ],
 
   inline: $ => [
-    $._statement,
-    $._top_level_item,
+    // $.statement,
+    // $.top_level_item,
     $._type_identifier,
     $._field_identifier,
     $._statement_identifier,
@@ -46,20 +46,27 @@ module.exports = grammar({
     [$._type_specifier, $._expression, $.macro_type_specifier],
     [$._type_specifier, $.macro_type_specifier],
     [$.sized_type_specifier],
+
+    [$.program, $.top_level_item],
+    [$.if],
+    [$.if_clause, $.else_if_clause],
   ],
 
   word: $ => $.identifier,
 
   rules: {
-    translation_unit: $ => repeat($._top_level_item),
+    program: $ => seq(
+      optional_with_placeholder('import_list', repeat(prec.dynamic(1, $.preproc_include))),
+      optional_with_placeholder('statement_list', repeat($.top_level_item))
+    ),
 
-    _top_level_item: $ => choice(
+    top_level_item: $ => choice(
       $.function_definition,
       $.linkage_specification,
       $.declaration,
-      $._statement,
+      $.statement,
       $.type_definition,
-      $._empty_declaration,
+      $.empty_declaration,
       $.preproc_if,
       $.preproc_ifdef,
       $.preproc_include,
@@ -106,7 +113,7 @@ module.exports = grammar({
       '\n'
     ),
 
-    ...preprocIf('', $ => $._top_level_item),
+    ...preprocIf('', $ => $.top_level_item),
     ...preprocIf('_in_field_declaration_list', $ => $._field_declaration_list_item),
 
     preproc_directive: $ => /#[ \t]*[a-zA-Z]\w*/,
@@ -185,17 +192,21 @@ module.exports = grammar({
 
     function_definition: $ => seq(
       optional($.ms_call_modifier),
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._declarator),
       field('body', $.compound_statement)
     ),
 
-    declaration: $ => seq(
-      $._declaration_specifiers,
-      commaSep1(field('declarator', choice(
+    declaration_without_semicolon: $ => seq(
+      $.declaration_specifiers,
+      commaSep1(field('top_level_declarator', choice(
         $._declarator,
         $.init_declarator
-      ))),
+      )))
+    ), 
+
+    declaration: $ => seq(
+      $.declaration_without_semicolon,
       ';'
     ),
 
@@ -207,7 +218,7 @@ module.exports = grammar({
       ';'
     ),
 
-    _declaration_specifiers: $ => seq(
+    declaration_specifiers: $ => seq(
       repeat(choice(
         $.storage_class_specifier,
         $.type_qualifier,
@@ -278,7 +289,7 @@ module.exports = grammar({
 
     declaration_list: $ => seq(
       '{',
-      repeat($._top_level_item),
+      optional_with_placeholder('statement_list', repeat($.top_level_item)),
       '}'
     ),
 
@@ -365,20 +376,20 @@ module.exports = grammar({
     function_declarator: $ => prec(1,
       seq(
         field('declarator', $._declarator),
-        field('parameters', $.parameter_list),
+        field('parameters', $.parameter_list_block),
         repeat($.attribute_specifier),
       )),
     function_field_declarator: $ => prec(1, seq(
       field('declarator', $._field_declarator),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
     function_type_declarator: $ => prec(1, seq(
       field('declarator', $._type_declarator),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
     abstract_function_declarator: $ => prec(1, seq(
       field('declarator', optional($._abstract_declarator)),
-      field('parameters', $.parameter_list)
+      field('parameters', $.parameter_list_block)
     )),
 
     array_declarator: $ => prec(1, seq(
@@ -418,7 +429,7 @@ module.exports = grammar({
 
     compound_statement: $ => seq(
       '{',
-      repeat($._top_level_item),
+      optional_with_placeholder('statement_list', repeat($.top_level_item)),
       '}'
     ),
 
@@ -535,7 +546,7 @@ module.exports = grammar({
     ),
 
     field_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       commaSep(field('declarator', $._field_declarator)),
       optional($.bitfield_clause),
       ';'
@@ -548,14 +559,16 @@ module.exports = grammar({
       optional(seq('=', field('value', $._expression)))
     ),
 
-    parameter_list: $ => seq(
+    parameter_list: $ => commaSep1(field('parameter', choice($.parameter_declaration, '...'))),
+
+    parameter_list_block: $ => seq(
       '(',
-      commaSep(choice($.parameter_declaration, '...')),
+      optional_with_placeholder('parameter_list', $.parameter_list),
       ')'
     ),
 
     parameter_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       optional(field('declarator', choice(
         $._declarator,
         $._abstract_declarator
@@ -564,7 +577,7 @@ module.exports = grammar({
 
     // Statements
 
-    _statement: $ => choice(
+    statement: $ => choice(
       $.case_statement,
       $._non_case_statement
     ),
@@ -573,7 +586,7 @@ module.exports = grammar({
       $.labeled_statement,
       $.compound_statement,
       $.expression_statement,
-      $.if_statement,
+      $.if,
       $.switch_statement,
       $.do_statement,
       $.while_statement,
@@ -587,7 +600,7 @@ module.exports = grammar({
     labeled_statement: $ => seq(
       field('label', $._statement_identifier),
       ':',
-      $._statement
+      $.statement
     ),
 
     expression_statement: $ => seq(
@@ -598,19 +611,32 @@ module.exports = grammar({
       ';'
     ),
 
-    if_statement: $ => prec.right(seq(
-      'if',
-      field('condition', $.parenthesized_expression),
-      field('consequence', $._statement),
-      optional(seq(
-        'else',
-        field('alternative', $._statement)
-      ))
-    )),
+    condition: $ => choice($._expression, $.comma_expression),
+
+    if: $ => seq(
+      $.if_clause, 
+      optional_with_placeholder(
+        'else_if_clause_list',
+        repeat($.else_if_clause)
+      ),
+      optional_with_placeholder('else_clause_optional', $.else_clause)
+    ),
+
+    if_clause: $ => prec.dynamic(0, 
+      seq('if', '(', $.condition, ')', $.statement),
+    ),
+
+    else_if_clause: $ => prec.dynamic(1, seq(
+      'else', 'if', '(', $.condition, ')', $.statement
+    )), 
+
+    else_clause: $ => seq('else', $.statement),
 
     switch_statement: $ => seq(
       'switch',
-      field('condition', $.parenthesized_expression),
+      '(', 
+      $.condition, 
+      ')', 
       field('body', $.compound_statement)
     ),
 
@@ -629,13 +655,15 @@ module.exports = grammar({
 
     while_statement: $ => seq(
       'while',
-      field('condition', $.parenthesized_expression),
-      field('body', $._statement)
+      '(', 
+      $.condition, 
+      ')', 
+      field('body', $.statement)
     ),
 
     do_statement: $ => seq(
       'do',
-      field('body', $._statement),
+      field('body', $.statement),
       'while',
       field('condition', $.parenthesized_expression),
       ';'
@@ -651,7 +679,7 @@ module.exports = grammar({
       field('condition', optional($._expression)), ';',
       field('update', optional(choice($._expression, $.comma_expression))),
       ')',
-      $._statement
+      $.statement
     ),
 
     return_statement: $ => seq(
@@ -946,11 +974,11 @@ module.exports = grammar({
 
     identifier: $ => /[a-zA-Z_]\w*/,
 
-    _type_identifier: $ => alias($.identifier, $.type_identifier),
-    _field_identifier: $ => alias($.identifier, $.field_identifier),
-    _statement_identifier: $ => alias($.identifier, $.statement_identifier),
+    _type_identifier: $ => $.identifier,
+    _field_identifier: $ => $.identifier,
+    _statement_identifier: $ => $.identifier,
 
-    _empty_declaration: $ => seq(
+    empty_declaration: $ => seq(
       $._type_specifier,
       ';'
     ),
@@ -975,7 +1003,7 @@ module.exports = grammar({
 
   supertypes: $ => [
     $._expression,
-    $._statement,
+    $.statement,
     $._type_specifier,
     $._declarator,
     $._field_declarator,
@@ -1041,4 +1069,8 @@ function commaSep1 (rule) {
 
 function commaSepTrailing (recurSymbol, rule) {
   return choice(rule, seq(recurSymbol, ',', rule))
+}
+
+function optional_with_placeholder(field_name, rule) {
+  return choice(field(field_name, rule), field(field_name, blank()));
 }
