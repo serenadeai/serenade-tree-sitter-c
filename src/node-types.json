@@ -582,6 +582,25 @@
     }
   },
   {
+    "type": "assignment_value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "_expression",
+          "named": true
+        },
+        {
+          "type": "initializer_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "attribute_specifier",
     "named": true,
     "fields": {
@@ -732,16 +751,17 @@
   {
     "type": "bitfield_clause",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
+    "fields": {
+      "assignment_value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1569,7 +1589,7 @@
     "type": "field_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1917,16 +1937,16 @@
     "type": "init_declarator",
     "named": true,
     "fields": {
-      "assignment_value": {
-        "multiple": false,
+      "assignment_value_list_optional": {
+        "multiple": true,
         "required": true,
         "types": [
           {
-            "type": "_expression",
-            "named": true
+            "type": "=",
+            "named": false
           },
           {
-            "type": "initializer_list",
+            "type": "assignment_value",
             "named": true
           }
         ]
@@ -2440,7 +2460,7 @@
     "type": "pointer_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
@@ -2566,7 +2586,7 @@
     "type": "preproc_call",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": false,
         "types": [
@@ -3367,7 +3387,7 @@
     "type": "subscript_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
@@ -3654,7 +3674,7 @@
     "type": "unary_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [
@@ -3736,7 +3756,7 @@
     "type": "update_expression",
     "named": true,
     "fields": {
-      "argument": {
+      "argument_": {
         "multiple": false,
         "required": true,
         "types": [

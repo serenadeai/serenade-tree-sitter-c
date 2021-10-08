@@ -109,7 +109,7 @@ module.exports = grammar({
 
     preproc_call: $ => seq(
       field('directive', $.preproc_directive),
-      field('argument', optional($.preproc_arg)),
+      field('argument_', optional($.preproc_arg)),
       '\n'
     ),
 
@@ -143,7 +143,7 @@ module.exports = grammar({
 
     preproc_unary_expression: $ => prec.left(PREC.UNARY, seq(
       field('operator', choice('!', '~', '-', '+')),
-      field('argument', $._preproc_expression)
+      field('argument_', $._preproc_expression)
     )),
 
     preproc_call_expression: $ => prec(PREC.CALL, seq(
@@ -418,10 +418,14 @@ module.exports = grammar({
       ']'
     )),
 
+    init_declarator_value: $ => choice($.initializer_list, $._expression), 
+
     init_declarator: $ => seq(
       field('assignment_variable', $._declarator),
-      '=',
-      field('assignment_value', choice($.initializer_list, $._expression))
+      field('assignment_value_list_optional', seq(
+        '=',
+        alias($.init_declarator_value, $.assignment_value)
+      ))
     ),
 
     enclosed_body: $ => seq(
@@ -556,7 +560,7 @@ module.exports = grammar({
       ';'
     ),
 
-    bitfield_clause: $ => seq(':', $._expression),
+    bitfield_clause: $ => seq(':', field('assignment_value', $._expression)),
 
     enumerator: $ => seq(
       field('name', $.identifier),
@@ -787,12 +791,12 @@ module.exports = grammar({
 
     pointer_expression: $ => prec.left(PREC.CAST, seq(
       field('operator', choice('*', '&')),
-      field('argument', $._expression)
+      field('argument_', $._expression)
     )),
 
     unary_expression: $ => prec.left(PREC.UNARY, seq(
       field('operator', choice('!', '~', '-', '+')),
-      field('argument', $._expression)
+      field('argument_', $._expression)
     )),
 
     binary_expression: $ => {
@@ -827,7 +831,7 @@ module.exports = grammar({
     },
 
     update_expression: $ => {
-      const argument = field('argument', $._expression);
+      const argument = field('argument_', $._expression);
       const operator = field('operator', choice('--', '++'));
       return prec.right(PREC.UNARY, choice(
         seq(operator, argument),
@@ -858,7 +862,7 @@ module.exports = grammar({
     )),
 
     subscript_expression: $ => prec(PREC.SUBSCRIPT, seq(
-      field('argument', $._expression),
+      field('argument_', $._expression),
       '[',
       field('index', $._expression),
       ']'
@@ -877,7 +881,7 @@ module.exports = grammar({
 
     field_expression: $ => seq(
       prec(PREC.FIELD, seq(
-        field('argument', $._expression),
+        field('argument_', $._expression),
         field('operator', choice('.', '->'))
       )),
       field('field', $._field_identifier)
@@ -1023,12 +1027,6 @@ module.exports = grammar({
 
   supertypes: $ => [
     $._expression,
-    // $.statement,
-    // $._type_specifier,
-    // $._declarator,
-    // $.field_declarator,
-    // $._type_declarator,
-    // $._abstract_declarator,
   ]
 });
 
