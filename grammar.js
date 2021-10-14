@@ -374,7 +374,7 @@ module.exports = grammar({
       seq(
         field('identifier', $._declarator),
         field('parameters', $.parameter_list_block),
-        repeat($.attribute_specifier),
+        optional_with_placeholder('modifier_list', repeat($.attribute_specifier)),
       )),
     function_field_declarator: $ => prec(1, seq(
       field('identifier', $.field_declarator),
