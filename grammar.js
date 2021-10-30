@@ -42,8 +42,8 @@ module.exports = grammar({
   conflicts: $ => [
     [$._type_specifier, $._declarator],
     [$._type_specifier, $._declarator, $.macro_type_specifier],
-    [$._type_specifier, $._expression],
-    [$._type_specifier, $._expression, $.macro_type_specifier],
+    [$._type_specifier, $.expression_],
+    [$._type_specifier, $.expression_, $.macro_type_specifier],
     [$._type_specifier, $.macro_type_specifier],
     [$.sized_type_specifier],
 
@@ -91,7 +91,7 @@ module.exports = grammar({
     preproc_def: $ => seq(
       preprocessor('define'),
       field('name', $.identifier),
-      field('value', optional($.preproc_arg)),
+      optional(field('value', $.preproc_arg)),
       '\n'
     ),
 
@@ -99,7 +99,7 @@ module.exports = grammar({
       preprocessor('define'),
       field('name', $.identifier),
       field('parameters', $.preproc_params),
-      field('value', optional($.preproc_arg)),
+      optional(field('value', $.preproc_arg)),
       '\n'
     ),
 
@@ -109,12 +109,12 @@ module.exports = grammar({
 
     preproc_call: $ => seq(
       field('directive', $.preproc_directive),
-      field('argument_', optional($.preproc_arg)),
+      optional(field('argument_', $.preproc_arg)),
       '\n'
     ),
 
     ...preprocIf('', $ => $.top_level_item),
-    ...preprocIf('_in_field_declaration_list', $ => $._field_declaration_list_item),
+    ...preprocIf('_in_field_declaration_list', $ => $.field_declaration_list_item_),
 
     preproc_directive: $ => /#[ \t]*[a-zA-Z]\w*/,
     preproc_arg: $ => token(prec(-1, repeat1(/.|\\\r?\n/))),
@@ -367,7 +367,7 @@ module.exports = grammar({
     ))),
     abstract_pointer_declarator: $ => prec.dynamic(1, prec.right(seq('*',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('declarator', optional($._abstract_declarator))
+      optional(field('declarator', $._abstract_declarator))
     ))),
 
     function_declarator: $ => prec(1,
@@ -385,7 +385,7 @@ module.exports = grammar({
       field('parameters', $.parameter_list_block)
     )),
     abstract_function_declarator: $ => prec(1, seq(
-      field('identifier', optional($._abstract_declarator)),
+      optional(field('identifier', $._abstract_declarator)),
       field('parameters', $.parameter_list_block)
     )),
 
@@ -393,32 +393,32 @@ module.exports = grammar({
       field('declarator', $._declarator),
       '[',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('size', optional(choice($._expression, '*'))),
+      optional(field('size', choice($.expression_, '*'))),
       ']'
     )),
     array_field_declarator: $ => prec(1, seq(
       field('declarator', $.field_declarator),
       '[',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('size', optional(choice($._expression, '*'))),
+      optional(field('size', choice($.expression_, '*'))),
       ']'
     )),
     array_type_declarator: $ => prec(1, seq(
       field('declarator', $._type_declarator),
       '[',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('size', optional(choice($._expression, '*'))),
+      optional(field('size', choice($.expression_, '*'))),
       ']'
     )),
     abstract_array_declarator: $ => prec(1, seq(
-      field('declarator', optional($._abstract_declarator)),
+      optional(field('declarator', $._abstract_declarator)),
       '[',
       optional_with_placeholder('modifier_list', repeat($.type_qualifier)),
-      field('size', optional(choice($._expression, '*'))),
+      optional(field('size', choice($.expression_, '*'))),
       ']'
     )),
 
-    init_declarator_value: $ => choice($.initializer_list, $._expression), 
+    init_declarator_value: $ => choice($.initializer_list, $.expression_), 
 
     init_declarator: $ => seq(
       field('assignment_variable', $._declarator),
@@ -442,12 +442,13 @@ module.exports = grammar({
       'inline'
     )),
 
-    type_qualifier: $ => field('modifier', choice(
+    // This is wrapped with 'modifier' in -cpp. 
+    type_qualifier: $ => choice(
       'const',
       'volatile',
       'restrict',
       '_Atomic'
-    )),
+    ),
 
     _type_specifier: $ => choice(
       $.struct_specifier,
@@ -466,7 +467,7 @@ module.exports = grammar({
         'long',
         'short'
       )),
-      field('type', optional(choice(
+      optional(field('type', choice(
         prec.dynamic(-1, $._type_identifier),
         $.primitive_type
       )))
@@ -505,7 +506,7 @@ module.exports = grammar({
       optional_with_placeholder(
         'enum_member_list',
         seq(
-          commaSep($.enumerator),
+          commaSep(alias($.enumerator, $.member)),
           optional(',')
       )),
       '}'
@@ -538,12 +539,12 @@ module.exports = grammar({
     field_declaration_list: $ => seq(
       '{',
       optional_with_placeholder('class_member_list',
-        repeat($._field_declaration_list_item)
+        repeat(alias($.field_declaration_list_item_, $.member))
       ),
       '}'
     ),
 
-    _field_declaration_list_item: $ => choice(
+    field_declaration_list_item_: $ => choice(
       $.field_declaration,
       $.preproc_def,
       $.preproc_function_def,
@@ -560,11 +561,11 @@ module.exports = grammar({
       ';'
     ),
 
-    bitfield_clause: $ => seq(':', field('assignment_value', $._expression)),
+    bitfield_clause: $ => seq(':', field('assignment_value', $.expression_)),
 
     enumerator: $ => seq(
       field('name', $.identifier),
-      optional(seq('=', field('value', $._expression)))
+      optional(seq('=', field('value', $.expression_)))
     ),
 
     parameter_list: $ => commaSep1(field('parameter', choice($.parameter_declaration, '...'))),
@@ -613,13 +614,13 @@ module.exports = grammar({
 
     expression_statement: $ => seq(
       optional(choice(
-        $._expression,
+        $.expression_,
         $.comma_expression
       )),
       ';'
     ),
 
-    condition: $ => choice($._expression, $.comma_expression),
+    condition: $ => choice($.expression_, $.comma_expression),
 
     if: $ => seq(
       $.if_clause, 
@@ -650,7 +651,7 @@ module.exports = grammar({
 
     case_statement: $ => prec.right(seq(
       choice(
-        seq('case', field('value', $._expression)),
+        seq('case', field('value', $.expression_)),
         'default'
       ),
       ':',
@@ -686,7 +687,7 @@ module.exports = grammar({
       '(',
       optional_with_placeholder('block_initializer_optional', $.block_initializer),
       ';', 
-      optional_with_placeholder('condition_optional', alias($._expression, $.condition)),
+      optional_with_placeholder('condition_optional', alias($.expression_, $.condition)),
       ';',
       optional_with_placeholder('block_update_optional', $.block_update),
       ')',
@@ -695,12 +696,12 @@ module.exports = grammar({
 
     block_initializer: $ => choice(
       $.declaration_without_semicolon,
-      choice($._expression, $.comma_expression)
+      choice($.expression_, $.comma_expression)
     ), 
 
-    block_update: $ => choice($._expression, $.comma_expression), 
+    block_update: $ => choice($.expression_, $.comma_expression), 
 
-    return_value: $ => choice($._expression, $.comma_expression), 
+    return_value: $ => choice($.expression_, $.comma_expression), 
 
     return: $ => seq(
       'return',
@@ -724,7 +725,7 @@ module.exports = grammar({
 
     // Expressions
 
-    _expression: $ => choice(
+    expression_: $ => choice(
       $.conditional_expression,
       $.assignment_expression,
       $.binary_expression,
@@ -749,17 +750,17 @@ module.exports = grammar({
     ),
 
     comma_expression: $ => seq(
-      field('left', $._expression),
+      field('left', $.expression_),
       ',',
-      field('right', choice($._expression, $.comma_expression))
+      field('right', choice($.expression_, $.comma_expression))
     ),
 
     conditional_expression: $ => prec.right(PREC.CONDITIONAL, seq(
-      field('condition', $._expression),
+      field('condition', $.expression_),
       '?',
-      field('consequence', $._expression),
+      field('consequence', $.expression_),
       ':',
-      field('alternative', $._expression)
+      field('alternative', $.expression_)
     )),
 
     _assignment_left_expression: $ => choice(
@@ -786,17 +787,17 @@ module.exports = grammar({
         '^=',
         '|='
       )),
-      field('right', $._expression)
+      field('right', $.expression_)
     )),
 
     pointer_expression: $ => prec.left(PREC.CAST, seq(
       field('operator', choice('*', '&')),
-      field('argument_', $._expression)
+      field('argument_', $.expression_)
     )),
 
     unary_expression: $ => prec.left(PREC.UNARY, seq(
       field('operator', choice('!', '~', '-', '+')),
-      field('argument_', $._expression)
+      field('argument_', $.expression_)
     )),
 
     binary_expression: $ => {
@@ -823,15 +824,15 @@ module.exports = grammar({
 
       return choice(...table.map(([operator, precedence]) => {
         return prec.left(precedence, seq(
-          field('left', $._expression),
+          field('left', $.expression_),
           field('operator', operator),
-          field('right', $._expression)
+          field('right', $.expression_)
         ))
       }));
     },
 
     update_expression: $ => {
-      const argument = field('argument_', $._expression);
+      const argument = field('argument_', $.expression_);
       const operator = field('operator', choice('--', '++'));
       return prec.right(PREC.UNARY, choice(
         seq(operator, argument),
@@ -843,7 +844,7 @@ module.exports = grammar({
       '(',
       field('type', $.type_descriptor),
       ')',
-      field('value', $._expression)
+      field('value', $.expression_)
     )),
 
     type_descriptor: $ => seq(
@@ -856,24 +857,24 @@ module.exports = grammar({
     sizeof_expression: $ => prec(PREC.SIZEOF, seq(
       'sizeof',
       choice(
-        field('value', $._expression),
+        field('value', $.expression_),
         seq('(', field('type', $.type_descriptor), ')')
       )
     )),
 
     subscript_expression: $ => prec(PREC.SUBSCRIPT, seq(
-      field('argument_', $._expression),
+      field('argument_', $.expression_),
       '[',
-      field('index', $._expression),
+      field('index', $.expression_),
       ']'
     )),
 
     call_expression: $ => prec(PREC.CALL, seq(
-      field('function_', $._expression),
+      field('function_', $.expression_),
       field('arguments', $.argument_list_block)
     )),
 
-    argument: $ => $._expression, 
+    argument: $ => $.expression_, 
 
     argument_list: $ => commaSep1($.argument), 
 
@@ -881,7 +882,7 @@ module.exports = grammar({
 
     field_expression: $ => seq(
       prec(PREC.FIELD, seq(
-        field('argument_', $._expression),
+        field('argument_', $.expression_),
         field('operator', choice('.', '->'))
       )),
       field('field', $._field_identifier)
@@ -896,7 +897,7 @@ module.exports = grammar({
 
     parenthesized_expression: $ => seq(
       '(',
-      choice($._expression, $.comma_expression),
+      choice($.expression_, $.comma_expression),
       ')'
     ),
 
@@ -904,7 +905,7 @@ module.exports = grammar({
       '{',
       commaSep(choice(
         $.initializer_pair,
-        $._expression,
+        $.expression_,
         $.initializer_list
       )),
       optional(','),
@@ -914,10 +915,10 @@ module.exports = grammar({
     initializer_pair: $ => seq(
       field('designator', repeat1(choice($.subscript_designator, $.field_designator))),
       '=',
-      field('value', choice($._expression, $.initializer_list))
+      field('value', choice($.expression_, $.initializer_list))
     ),
 
-    subscript_designator: $ => seq('[', $._expression, ']'),
+    subscript_designator: $ => seq('[', $.expression_, ']'),
 
     field_designator: $ => seq('.', $._field_identifier),
 
@@ -1026,7 +1027,7 @@ module.exports = grammar({
   },
 
   supertypes: $ => [
-    $._expression,
+    // $.expression_,
   ]
 });
 
@@ -1046,7 +1047,7 @@ function preprocIf (suffix, content) {
       field('condition', $._preproc_expression),
       '\n',
       repeat(content($)),
-      field('alternative', optional(elseBlock($))),
+      optional(field('alternative', elseBlock($))),
       preprocessor('endif')
     ),
 
@@ -1054,7 +1055,7 @@ function preprocIf (suffix, content) {
       choice(preprocessor('ifdef'), preprocessor('ifndef')),
       field('name', $.identifier),
       repeat(content($)),
-      field('alternative', optional(elseBlock($))),
+      optional(field('alternative', elseBlock($))),
       preprocessor('endif')
     ),
 
@@ -1068,7 +1069,7 @@ function preprocIf (suffix, content) {
       field('condition', $._preproc_expression),
       '\n',
       repeat(content($)),
-      field('alternative', optional(elseBlock($))),
+      optional(field('alternative', elseBlock($))),
     )
   }
 }
