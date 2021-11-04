@@ -3903,7 +3903,7 @@
           "members": [
             {
               "type": "FIELD",
-              "name": "declarator",
+              "name": "identifier",
               "content": {
                 "type": "CHOICE",
                 "members": [

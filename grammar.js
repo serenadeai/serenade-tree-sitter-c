@@ -578,7 +578,7 @@ module.exports = grammar({
 
     parameter_declaration: $ => seq(
       $.declaration_specifiers,
-      optional(field('declarator', choice(
+      optional(field('identifier', choice(
         $._declarator,
         $._abstract_declarator
       )))

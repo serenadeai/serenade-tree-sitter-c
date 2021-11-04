@@ -2388,7 +2388,7 @@
     "type": "parameter_declaration",
     "named": true,
     "fields": {
-      "declarator": {
+      "identifier": {
         "multiple": false,
         "required": false,
         "types": [
