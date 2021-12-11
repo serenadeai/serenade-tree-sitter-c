@@ -5699,12 +5699,8 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "FIELD",
-                "name": "value",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "expression_"
-                }
+                "type": "SYMBOL",
+                "name": "expression_"
               },
               {
                 "type": "SEQ",
