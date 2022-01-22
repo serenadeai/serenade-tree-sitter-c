@@ -135,7 +135,7 @@ module.exports = grammar({
         $.identifier,
         alias($.preproc_call_expression, $.call),
         $.number_literal,
-        $.char_literal,
+        $.character_literal,
         $.preproc_defined,
         alias($.preproc_unary_expression, $.unary_expression),
         alias($.preproc_binary_expression, $.binary_expression),
@@ -813,7 +813,7 @@ module.exports = grammar({
         $.false,
         $.null,
         $.concatenated_string,
-        $.char_literal,
+        $.character_literal,
         $.parenthesized_expression
       ),
 
@@ -1068,7 +1068,7 @@ module.exports = grammar({
       )
     },
 
-    char_literal: $ =>
+    character_literal: $ =>
       seq(
         choice("L'", "u'", "U'", "u8'", "'"),
         choice($.escape_sequence, token.immediate(/[^\n']/)),
