@@ -201,7 +201,7 @@
           "named": true
         },
         {
-          "type": "char_literal",
+          "type": "character_literal",
           "named": true
         },
         {
@@ -555,7 +555,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
@@ -675,7 +675,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
@@ -926,7 +926,7 @@
     }
   },
   {
-    "type": "char_literal",
+    "type": "character_literal",
     "named": true,
     "fields": {},
     "children": {
@@ -1036,7 +1036,7 @@
           "named": true
         },
         {
-          "type": "char_literal",
+          "type": "character_literal",
           "named": true
         },
         {
@@ -1495,7 +1495,7 @@
           "named": true
         },
         {
-          "type": "char_literal",
+          "type": "character_literal",
           "named": true
         },
         {
@@ -2106,26 +2106,126 @@
     }
   },
   {
-    "type": "initializer_list",
+    "type": "initializer_expression",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
-      "required": false,
+      "multiple": false,
+      "required": true,
       "types": [
         {
-          "type": "expression_",
+          "type": "assignment_expression",
           "named": true
         },
         {
-          "type": "initializer_list",
+          "type": "binary_expression",
           "named": true
         },
         {
-          "type": "initializer_pair",
+          "type": "call_expression",
+          "named": true
+        },
+        {
+          "type": "cast_expression",
+          "named": true
+        },
+        {
+          "type": "character_literal",
+          "named": true
+        },
+        {
+          "type": "compound_literal_expression",
+          "named": true
+        },
+        {
+          "type": "concatenated_string",
+          "named": true
+        },
+        {
+          "type": "conditional_expression",
+          "named": true
+        },
+        {
+          "type": "false",
+          "named": true
+        },
+        {
+          "type": "field_expression",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "null",
+          "named": true
+        },
+        {
+          "type": "number_literal",
+          "named": true
+        },
+        {
+          "type": "parenthesized_expression",
+          "named": true
+        },
+        {
+          "type": "pointer_expression",
+          "named": true
+        },
+        {
+          "type": "sizeof_expression",
+          "named": true
+        },
+        {
+          "type": "string_literal",
+          "named": true
+        },
+        {
+          "type": "subscript_expression",
+          "named": true
+        },
+        {
+          "type": "true",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "update_expression",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "initializer_list",
+    "named": true,
+    "fields": {
+      "initializer_expression_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "initializer_expression",
+            "named": true
+          },
+          {
+            "type": "initializer_list",
+            "named": true
+          },
+          {
+            "type": "initializer_pair",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2526,7 +2626,7 @@
           "named": true
         },
         {
-          "type": "char_literal",
+          "type": "character_literal",
           "named": true
         },
         {
@@ -2886,7 +2986,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
@@ -3013,7 +3113,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
@@ -3081,7 +3181,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
@@ -3790,7 +3890,7 @@
             "named": true
           },
           {
-            "type": "char_literal",
+            "type": "character_literal",
             "named": true
           },
           {
