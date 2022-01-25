@@ -1019,7 +1019,16 @@ module.exports = grammar({
     initializer_list: $ =>
       seq(
         '{',
-        commaSep(choice($.initializer_pair, $.expression_, $.initializer_list)),
+        optional_with_placeholder(
+          'initializer_expression_list',
+          commaSep(
+            choice(
+              $.initializer_pair,
+              alias($.expression_, $.initializer_expression),
+              $.initializer_list
+            )
+          )
+        ),
         optional(','),
         '}'
       ),

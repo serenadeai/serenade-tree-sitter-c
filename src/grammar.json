@@ -866,7 +866,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "char_literal"
+          "name": "character_literal"
         },
         {
           "type": "SYMBOL",
@@ -4643,7 +4643,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "char_literal"
+          "name": "character_literal"
         },
         {
           "type": "SYMBOL",
@@ -5961,34 +5961,14 @@
           "type": "CHOICE",
           "members": [
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "initializer_pair"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "expression_"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "initializer_list"
-                    }
-                  ]
-                },
-                {
-                  "type": "REPEAT",
-                  "content": {
+              "type": "FIELD",
+              "name": "initializer_expression_list",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
                     "type": "SEQ",
                     "members": [
-                      {
-                        "type": "STRING",
-                        "value": ","
-                      },
                       {
                         "type": "CHOICE",
                         "members": [
@@ -5997,22 +5977,68 @@
                             "name": "initializer_pair"
                           },
                           {
-                            "type": "SYMBOL",
-                            "name": "expression_"
+                            "type": "ALIAS",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "expression_"
+                            },
+                            "named": true,
+                            "value": "initializer_expression"
                           },
                           {
                             "type": "SYMBOL",
                             "name": "initializer_list"
                           }
                         ]
+                      },
+                      {
+                        "type": "REPEAT",
+                        "content": {
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "STRING",
+                              "value": ","
+                            },
+                            {
+                              "type": "CHOICE",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "initializer_pair"
+                                },
+                                {
+                                  "type": "ALIAS",
+                                  "content": {
+                                    "type": "SYMBOL",
+                                    "name": "expression_"
+                                  },
+                                  "named": true,
+                                  "value": "initializer_expression"
+                                },
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "initializer_list"
+                                }
+                              ]
+                            }
+                          ]
+                        }
                       }
                     ]
+                  },
+                  {
+                    "type": "BLANK"
                   }
-                }
-              ]
+                ]
+              }
             },
             {
-              "type": "BLANK"
+              "type": "FIELD",
+              "name": "initializer_expression_list",
+              "content": {
+                "type": "BLANK"
+              }
             }
           ]
         },
@@ -6478,7 +6504,7 @@
         ]
       }
     },
-    "char_literal": {
+    "character_literal": {
       "type": "SEQ",
       "members": [
         {
